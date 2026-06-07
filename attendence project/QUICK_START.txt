@@ -394,12 +394,9 @@ All files are in: c:\Users\ramya\OneDrive\Documents\project\attendence project\
    • Review API docs in DELIVERY_REPORT.txt
    • Run demo_test.py for validation
 
-👥 Team
+👥 member
    • G. Balaji
-   • M. Iyyanar
-   • Boopathi
-   • K. Gowsick
-   • V. Chanakyan
+ 
 
 ═══════════════════════════════════════════════════════════════════════════════
                         PROJECT SUMMARY
