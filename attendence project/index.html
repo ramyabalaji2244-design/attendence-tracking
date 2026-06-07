@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Tracking & Attendance System</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h1>📍 Student Tracking System</h1>
+            </div>
+            <div class="nav-menu">
+                <button class="nav-btn active" onclick="showTab('dashboard')">Dashboard</button>
+                <button class="nav-btn" onclick="showTab('tracking')">Live Tracking</button>
+                <button class="nav-btn" onclick="showTab('attendance')">Attendance</button>
+                <button class="nav-btn" onclick="showTab('alerts')">Safety Alerts</button>
+                <button class="nav-btn" onclick="showTab('settings')">Settings</button>
+            </div>
+            <div class="user-profile">
+                <span id="userName">Parent User</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </nav>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <h2>Student Dashboard</h2>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Students Tracked</h3>
+                    <p class="stat-number" id="studentCount">5</p>
+                </div>
+                <div class="card">
+                    <h3>Today's Attendance</h3>
+                    <p class="stat-number" id="attendancePercent">92%</p>
+                </div>
+                <div class="card">
+                    <h3>Active Devices</h3>
+                    <p class="stat-number" id="activeDevices">5</p>
+                </div>
+                <div class="card">
+                    <h3>Last Update</h3>
+                    <p class="stat-number" id="lastUpdate">2 min ago</p>
+                </div>
+            </div>
+
+            <!-- Attendance Chart -->
+            <div class="chart-container">
+                <h3>Weekly Attendance Trend</h3>
+                <canvas id="attendanceChart"></canvas>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="recent-activity">
+                <h3>Recent Activity</h3>
+                <div id="activityList" class="activity-list">
+                    <div class="activity-item">
+                        <span class="time">10:30 AM</span>
+                        <span class="message">Ravi marked present by facial recognition</span>
+                        <span class="status success">✓</span>
+                    </div>
+                    <div class="activity-item">
+                        <span class="time">10:45 AM</span>
+                        <span class="message">Emma picked up from school</span>
+                        <span class="status success">✓</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Tracking Tab -->
+        <div id="tracking" class="tab-content">
+            <h2>Live GPS Tracking</h2>
+            <div class="tracking-grid">
+                <div id="map" class="map-container"></div>
+                <div class="student-list-panel">
+                    <h3>Students Location</h3>
+                    <div id="studentLocations" class="location-list">
+                        <div class="student-location">
+                            <div class="location-header">
+                                <h4>Ravi Kumar</h4>
+                                <span class="online-indicator">●</span>
+                            </div>
+                            <p>Status: In Transit</p>
+                            <p>Location: Main Street, Sector 7</p>
+                            <p>Speed: 25 km/h</p>
+                            <button onclick="centerMap(12.9716, 77.5946)">View on Map</button>
+                        </div>
+                        <div class="student-location">
+                            <div class="location-header">
+                                <h4>Emma Wilson</h4>
+                                <span class="online-indicator">●</span>
+                            </div>
+                            <p>Status: At School</p>
+                            <p>Location: School Campus</p>
+                            <p>Speed: 0 km/h</p>
+                            <button onclick="centerMap(12.9352, 77.6245)">View on Map</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Tab -->
+        <div id="attendance" class="tab-content">
+            <h2>Attendance Records</h2>
+            <div class="filter-bar">
+                <input type="date" id="attendanceDate" onchange="updateAttendanceTable()">
+                <select id="studentFilter" onchange="updateAttendanceTable()">
+                    <option value="">All Students</option>
+                    <option value="ravi">Ravi Kumar</option>
+                    <option value="emma">Emma Wilson</option>
+                    <option value="alex">Alex Johnson</option>
+                </select>
+            </div>
+
+            <table class="attendance-table">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Date</th>
+                        <th>Check-in Time</th>
+                        <th>Check-out Time</th>
+                        <th>Status</th>
+                        <th>Method</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceBody">
+                    <tr>
+                        <td>Ravi Kumar</td>
+                        <td>2024-05-15</td>
+                        <td>08:30 AM</td>
+                        <td>03:45 PM</td>
+                        <td><span class="badge present">Present</span></td>
+                        <td>Face Recognition</td>
+                    </tr>
+                    <tr>
+                        <td>Emma Wilson</td>
+                        <td>2024-05-15</td>
+                        <td>08:25 AM</td>
+                        <td>03:50 PM</td>
+                        <td><span class="badge present">Present</span></td>
+                        <td>Face Recognition</td>
+                    </tr>
+                    <tr>
+                        <td>Alex Johnson</td>
+                        <td>2024-05-15</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td><span class="badge absent">Absent</span></td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Safety Alerts Tab -->
+        <div id="alerts" class="tab-content">
+            <h2>Safety Alerts & Notifications</h2>
+            <div class="alerts-container">
+                <div class="alert alert-warning">
+                    <h4>⚠️ Unusual Route Detected</h4>
+                    <p>Ravi is taking a different route from school. Last updated: 2 min ago</p>
+                    <button onclick="alertAction('acknowledge')">Acknowledge</button>
+                </div>
+                <div class="alert alert-success">
+                    <h4>✓ Safe Arrival</h4>
+                    <p>Emma has safely arrived at home. Notified at 04:00 PM</p>
+                </div>
+                <div class="alert alert-info">
+                    <h4>ℹ️ Location Update</h4>
+                    <p>Alex is near checkpoint 5. Last updated: 5 min ago</p>
+                </div>
+                <div class="alert alert-warning">
+                    <h4>⚠️ Extended Stay Alert</h4>
+                    <p>Student has been at location for longer than expected duration.</p>
+                    <button onclick="alertAction('investigate')">Investigate</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <h2>Settings & Preferences</h2>
+            <div class="settings-grid">
+                <div class="setting-section">
+                    <h3>Notification Preferences</h3>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" checked> Attendance notifications
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" checked> Location alerts
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox"> Unusual activity alerts
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-section">
+                    <h3>Geofence Settings</h3>
+                    <div class="setting-item">
+                        <label>Safe Zone Radius (meters):</label>
+                        <input type="number" value="500" min="100" max="5000">
+                    </div>
+                    <div class="setting-item">
+                        <label>Alert if away from safe zone for:</label>
+                        <select>
+                            <option>5 minutes</option>
+                            <option>10 minutes</option>
+                            <option>15 minutes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="setting-section">
+                    <h3>Account Settings</h3>
+                    <div class="setting-item">
+                        <label>Email:</label>
+                        <input type="email" value="parent@example.com">
+                    </div>
+                    <div class="setting-item">
+                        <label>Phone:</label>
+                        <input type="tel" value="+91 XXXXXXXXXX">
+                    </div>
+                    <button class="save-btn" onclick="saveSettings()">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
